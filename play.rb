@@ -4,10 +4,12 @@
 
 class Hangman
   def initialize
-    @letters = ('a'..'z').to_a
     @word = words.sample
     @attempts = @word.first.size
-    @right_try = []
+    @word_preview = ""
+    @word.first.size.times do
+      @word_preview += "_ "
+    end
   end
 
   # Palavras que serão utilizadas no jogo
@@ -20,12 +22,20 @@ class Hangman
   end
 
   # Mostra a quantidade de letras da palavra e também as letras já acertadas.
-  def print_preview
-    word_preview = ""
-    @word.first.size.times do
-      word_preview += "_ "
+  def print_preview last_try = nil
+    update_preview(last_try) unless last_try.nil?
+    puts @word_preview
+  end
+
+  def update_preview last_try
+    new_preview = @word_preview.split
+
+    new_preview.each_with_index do |letter, index|
+      if letter == '_' && @word.first[index] == last_try
+        new_preview[index] = last_try
+      end
     end
-    puts word_preview
+    @word_preview = new_preview.join(' ')
   end
 
   #FIXME: O primeiro if do método trying ficou sem else, procurar saber se isso é um problema. Caso seja procurar saber como mudar.
@@ -36,7 +46,7 @@ class Hangman
       tried = @word.first.include? try
       if tried
         puts "Acertou!"
-        @right_try << try
+        # Remove tentativas corretas do alfabeto
         print_preview
         trying
       else
